@@ -126,7 +126,7 @@ def main(email, password, file_path, file_size):
         return
 
     # 4, Delete files
-    print(f'Files found: {i}. Total files size: {size} MB.')
+    print(f'Files found: {i}. Total files size: {int(size)} MB.')
     while True:
         action = input('Delete files? Type "y" to delete, type "n" to abort: ')
         if action == 'n':
@@ -142,7 +142,7 @@ def main(email, password, file_path, file_size):
     for file in files_selected:
         print(f'Delete file [{file["size"]} MB] — {file["url"]}')
         delete_file(conversation_id=file['conversation_id'], token_id=token_id, ticket_id=ticket_id, message_nr=file['message_nr'], attachment_id=file['attachment_id'])
-    print(f'Cleanup completed. Deleted files: {i}. Total files size: {size} MB.')
+    print(f'Cleanup completed. Deleted files: {i}. Total files size: {int(size)} MB.')
 
 
 if __name__ == '__main__':
