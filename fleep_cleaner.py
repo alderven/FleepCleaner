@@ -44,21 +44,13 @@ def parse_file(file_path):
                                 continue
 
                             if len(conversation['topic']) == 0:
-                                files.append({'topic': str(admins),
-                                              'time': big_message['store_time'],
-                                              'author': author,
-                                              'file_name': att['file_name'],
-                                              'url': 'https://fleep.io' + att['file_url'],
+                                files.append({'url': 'https://fleep.io' + att['file_url'],
                                               'conversation_id': att['conversation_id'],
                                               'message_nr': att['message_nr'],
                                               'attachment_id': att['attachment_id'],
                                               'size': round(att['file_size']/1024/1024, 1)})
                             else:
-                                files.append({'topic': conversation['topic'],
-                                              'time': big_message['store_time'],
-                                              'author': author,
-                                              'file_name': att['file_name'],
-                                              'url': 'https://fleep.io' + att['file_url'],
+                                files.append({'url': 'https://fleep.io' + att['file_url'],
                                               'conversation_id': att['conversation_id'],
                                               'message_nr': att['message_nr'],
                                               'attachment_id': att['attachment_id'],
@@ -150,6 +142,6 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--email', help='Fleep email', required=True)
     parser.add_argument('-p', '--password', help='Fleep password', required=True)
     parser.add_argument('-f', '--file', help='Path to exported json file', required=True)
-    parser.add_argument('-s', '--size', help='File size in MB to remove', required=True)
+    parser.add_argument('-s', '--size', help='File size in MB to remove', required=True, type=int)
     args = parser.parse_args()
     main(args.email, args.password, args.file, int(args.size))
