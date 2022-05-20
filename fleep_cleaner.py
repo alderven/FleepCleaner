@@ -25,31 +25,31 @@ def parse_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as fin:
         data = json.load(fin)
 
-        files = []
-        for contact in data['contacts']:
-            id_to_name[contact['account_id']] = contact['_formatted_name']
+    files = []
+    for contact in data['contacts']:
+        id_to_name[contact['account_id']] = contact['_formatted_name']
 
-        for conversation in data['conversations']:
-            user_name = id_to_name[conversation['profile_id']]
+    for conversation in data['conversations']:
+        user_name = id_to_name[conversation['profile_id']]
 
-            for big_message in conversation['messages']:
-                try:
-                    message = json.loads(big_message['message'])
-                    if 'attachments' in message.keys():
-                        author = id_to_name[big_message['account_id']]
-                        for att in message['attachments']:
+        for big_message in conversation['messages']:
+            try:
+                message = json.loads(big_message['message'])
+                if 'attachments' in message.keys():
+                    author = id_to_name[big_message['account_id']]
+                    for att in message['attachments']:
 
-                            if author != user_name:
-                                continue
+                        if author != user_name:
+                            continue
 
-                            files.append({'url': 'https://fleep.io' + att['file_url'],
-                                          'conversation_id': att['conversation_id'],
-                                          'message_nr': att['message_nr'],
-                                          'attachment_id': att['attachment_id'],
-                                          'size': round(att['file_size']/1024/1024, 1)})
+                        files.append({'url': 'https://fleep.io' + att['file_url'],
+                                      'conversation_id': att['conversation_id'],
+                                      'message_nr': att['message_nr'],
+                                      'attachment_id': att['attachment_id'],
+                                      'size': round(att['file_size']/1024/1024, 1)})
 
-                except:
-                    pass
+            except:
+                pass
 
     # 2. Return files list
     return files
@@ -114,7 +114,7 @@ def main(email, password, file_path, file_size):
     while True:
         action = input('Delete files? Type "y" to delete, type "n" to abort: ')
         if action == 'n':
-            print('Abort deletion')
+            print('Cleanup aborted')
             return
         elif action == 'y':
             break
@@ -134,6 +134,6 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--email', help='Fleep email', required=True)
     parser.add_argument('-p', '--password', help='Fleep password', required=True)
     parser.add_argument('-f', '--file', help='Path to exported json file', required=True)
-    parser.add_argument('-s', '--size', help='File size in MB to remove', required=True, type=int)
+    parser.add_argument('-s', '--size', help='File size in MB to filter files', required=True, type=int)
     args = parser.parse_args()
-    main(args.email, args.password, args.file, int(args.size))
+    main(args.email, args.password, args.file, args.size)
