@@ -79,12 +79,13 @@ def delete_file(conversation_id, token_id, ticket_id, message_nr, attachment_id)
     assert r.status_code == 200, r.text
 
 
-def main(email, password, file_path, file_size):
+def main(email, password, file_path, file_size, extension):
     """ Remove files from Fleep with defined file size
     :param email: Fleep email
     :param password: Fleep password
     :param file_path: Path to json file
-    :param file_size: File size in MB """
+    :param file_size: File size in MB
+    :param extension: File extension """
 
     # 1. Auth to Fleep
     print('1. Auth to Fleep')
@@ -100,7 +101,7 @@ def main(email, password, file_path, file_size):
     size = 0
     files_selected = []
     for file in files:
-        if file['size'] >= file_size:
+        if file['size'] >= file_size and file['url'].endswith(extension):
             i += 1
             size += file["size"]
             files_selected.append(file)
@@ -134,6 +135,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--email', help='Fleep email', required=True)
     parser.add_argument('-p', '--password', help='Fleep password', required=True)
     parser.add_argument('-f', '--file', help='Path to exported json file', required=True)
-    parser.add_argument('-s', '--size', help='File size in MB to filter files', required=True, type=int)
+    parser.add_argument('-s', '--size', help='Filter files by size in MB', required=False, type=int, default=0)
+    parser.add_argument('-ex', '--extension', help='Filter files by extension', required=False, default='')
     args = parser.parse_args()
-    main(args.email, args.password, args.file, args.size)
+    main(args.email, args.password, args.file, args.size, args.extension)
