@@ -31,7 +31,6 @@ def parse_file(file_path):
 
         for conversation in data['conversations']:
             user_name = id_to_name[conversation['profile_id']]
-            admins = list(map(lambda x: id_to_name[x], conversation['admins']))
 
             for big_message in conversation['messages']:
                 try:
@@ -43,18 +42,11 @@ def parse_file(file_path):
                             if author != user_name:
                                 continue
 
-                            if len(conversation['topic']) == 0:
-                                files.append({'url': 'https://fleep.io' + att['file_url'],
-                                              'conversation_id': att['conversation_id'],
-                                              'message_nr': att['message_nr'],
-                                              'attachment_id': att['attachment_id'],
-                                              'size': round(att['file_size']/1024/1024, 1)})
-                            else:
-                                files.append({'url': 'https://fleep.io' + att['file_url'],
-                                              'conversation_id': att['conversation_id'],
-                                              'message_nr': att['message_nr'],
-                                              'attachment_id': att['attachment_id'],
-                                              'size': round(att['file_size']/1024/1024, 1)})
+                            files.append({'url': 'https://fleep.io' + att['file_url'],
+                                          'conversation_id': att['conversation_id'],
+                                          'message_nr': att['message_nr'],
+                                          'attachment_id': att['attachment_id'],
+                                          'size': round(att['file_size']/1024/1024, 1)})
 
                 except:
                     pass
