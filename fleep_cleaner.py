@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import shutil
 import zipfile
 import argparse
@@ -81,6 +82,15 @@ def sync(token_id, ticket_id):
     return r.json()
 
 
+def export(token_id, ticket_id):
+    """ Export History
+    :param token_id: Fleep Token Id
+    :param ticket_id: Fleep Ticked Id
+    :return response body """
+    r = requests.post('https://fleep.io/api/account/export/start', cookies={'token_id': token_id}, json={'ticket': ticket_id})
+    assert r.status_code == 200, r.text
+
+
 def download(url, output_file, token_id, ticket_id):
     """ Download file
     :param url: File URL
@@ -104,6 +114,20 @@ def delete_file(conversation_id, token_id, ticket_id, message_nr, attachment_id)
     assert r.status_code == 200, r.text
 
 
+def wait(token_id, ticket_id):
+    """ Wait for the History export to complete
+    :param token_id: Fleep Token Id
+    :param ticket_id: Fleep Ticked Id """
+
+    while True:
+        r = sync(token_id, ticket_id)
+        export_progress = (r['stream'][0]['export_progress'])
+        if export_progress == 1.0:
+            break
+        else:
+            print(f'Export progress: {export_progress*100}%')
+
+
 def main(email, password, file_size, extension):
     """ Remove files from Fleep with defined file size
     :param email: Fleep email
@@ -115,8 +139,22 @@ def main(email, password, file_size, extension):
     print('1. Auth to Fleep')
     ticket_id, token_id = auth(email, password)
 
-    # 2. Download History file
-    print('2. Download History file')
+    # 2. Export History
+    print('Export History')
+    r = sync(token_id, ticket_id)
+    if r['stream'][0]['export_progress'] < 1:
+        # Wait for export to complete
+        wait(token_id, ticket_id)
+    elif r['stream'][0].get('export_files'):
+        # Export was completed some time ago
+        export_time = json.loads(r['stream'][0]['export_files'][0]['upload_time'])
+        export_days_ago = int((time.time() - export_time) / 60 / 60 / 24)
+        if export_days_ago > 1:
+            export(token_id, ticket_id)
+            wait(token_id, ticket_id)
+
+    # 3. Download History file
+    print('3. Download History file')
     r = sync(token_id, ticket_id)
     export_file = json.loads(r['stream'][0]['export_files'][0])
     file_name = export_file['file_name'][:-4]
@@ -127,12 +165,12 @@ def main(email, password, file_size, extension):
         with zipfile.ZipFile(output_file, 'r') as zip_ref:
             zip_ref.extractall()
 
-    # 3. Parse History  file
-    print('3. Parse History file')
+    # 4. Parse History file
+    print('4. Parse History file')
     files = parse_file(file_name)
 
-    # 4. Find files to delete
-    print('4. Find files to delete')
+    # 5. Find files to delete
+    print('5. Find files to delete')
     i = 0
     size = 0
     files_selected = []
@@ -146,7 +184,7 @@ def main(email, password, file_size, extension):
         print('Files not found! Exit script')
         return
 
-    # 5. Delete files
+    # Ask user
     print(f'Files found: {i}. Total files size: {int(size)} MB.')
     while True:
         action = input('Delete files? Type "y" to delete, type "n" to abort: ')
