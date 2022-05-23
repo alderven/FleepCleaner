@@ -121,11 +121,12 @@ def wait(token_id, ticket_id):
 
     while True:
         r = sync(token_id, ticket_id)
-        export_progress = (r['stream'][0]['export_progress'])
+        export_progress = float(r['stream'][0]['export_progress'])
         if export_progress == 1.0:
             break
         else:
-            print(f'Export progress: {export_progress*100}%')
+            print(f'Export progress: {int(export_progress*100)}%')
+            time.sleep(10)
 
 
 def main(email, password, file_size, extension):
@@ -140,16 +141,16 @@ def main(email, password, file_size, extension):
     ticket_id, token_id = auth(email, password)
 
     # 2. Export History
-    print('Export History')
+    print('2. Export History')
     r = sync(token_id, ticket_id)
-    if r['stream'][0]['export_progress'] < 1:
+    if float(r['stream'][0]['export_progress']) < 1:
         # Wait for export to complete
         wait(token_id, ticket_id)
     elif r['stream'][0].get('export_files'):
         # Export was completed some time ago
-        export_time = json.loads(r['stream'][0]['export_files'][0]['upload_time'])
+        export_time = json.loads(r['stream'][0]['export_files'][0])['upload_time']
         export_days_ago = int((time.time() - export_time) / 60 / 60 / 24)
-        if export_days_ago > 1:
+        if export_days_ago > 10:
             export(token_id, ticket_id)
             wait(token_id, ticket_id)
 
