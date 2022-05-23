@@ -2,12 +2,10 @@
 
 Можно задавать условия для удаления по размеру и расширению файлов
 
-## Подготовка
-1. Зайти в свой аккаунт во Флипе: слева внизу правой кнопкой мыши вызвать меню, выбрать в нём `Account`.
-2. Нажать `EXPORT HISTORY`. Дождаться окончания экспорта.
-4. Скачать и установить Питон: https://www.python.org/downloads/
-3. Скачать и распаковать архив с репозиторием: https://github.com/alderven/FleepCleaner/archive/refs/heads/master.zip
-5. Установить Питон зависимости:
+## Установка
+1. Скачать и установить Питон: https://www.python.org/downloads/
+2. Скачать и распаковать архив с репозиторием: https://github.com/alderven/FleepCleaner/archive/refs/heads/master.zip
+3. Установить Питон зависимости:
 
    `pip install -r /path/to/requirements.txt`
 
